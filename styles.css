@@ -31,10 +31,7 @@
   --color-tool-tuner-ink: #fff5d6;
   --color-tool-picker: #f1f3f4;
   --color-tool-picker-ink: #5f5a66;
-  --color-avatar-ring: rgba(173, 133, 255, 0.42);
-  --color-avatar-light: #9f7aea;
-  --color-avatar-mid: #7c3aed;
-  --color-avatar-dark: #4c1d95;
+  --color-avatar-solid: #8b3dff;
   --color-brand-blue: #5f99f7;
   --color-brand-red: #f28b82;
   --color-brand-yellow: #fdd663;
@@ -234,12 +231,12 @@ button {
 }
 
 .avatar {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.78);
-  box-shadow: 0 0 0 1px var(--color-avatar-ring);
-  background: radial-gradient(circle at 32% 28%, var(--color-avatar-light) 0%, var(--color-avatar-mid) 50%, var(--color-avatar-dark) 100%);
+  border: 0;
+  box-shadow: none;
+  background: var(--color-avatar-solid);
   font-size: 13px;
   font-weight: 700;
 }
@@ -622,7 +619,7 @@ button {
     padding-right: var(--space-6);
   }
 
-.searchbar input {
+  .searchbar input {
     font-size: 17px;
   }
 
