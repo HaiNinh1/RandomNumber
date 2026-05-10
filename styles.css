@@ -31,9 +31,10 @@
   --color-tool-tuner-ink: #fff5d6;
   --color-tool-picker: #f1f3f4;
   --color-tool-picker-ink: #5f5a66;
-  --color-avatar-ring: #1faa4b;
-  --color-avatar-light: #8a5b3c;
-  --color-avatar-dark: #3d2618;
+  --color-avatar-ring: rgba(173, 133, 255, 0.42);
+  --color-avatar-light: #9f7aea;
+  --color-avatar-mid: #7c3aed;
+  --color-avatar-dark: #4c1d95;
   --color-brand-blue: #5f99f7;
   --color-brand-red: #f28b82;
   --color-brand-yellow: #fdd663;
@@ -62,7 +63,7 @@
 
   --layout-left: clamp(24px, 18vw, 230px);
   --page-width: min(652px, calc(100vw - var(--layout-left) - var(--space-7)));
-  --search-width: min(860px, calc(100vw - var(--layout-left) - 300px));
+  --search-width: min(804px, calc(100vw - var(--layout-left) - 340px));
   --tool-thumb-size: 108px;
 }
 
@@ -111,7 +112,7 @@ button {
 }
 
 .topbar {
-  padding-top: var(--space-6);
+  padding-top: 20px;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -125,13 +126,13 @@ button {
   width: calc(100% - var(--layout-left) - var(--space-6));
   display: flex;
   align-items: center;
-  gap: var(--space-5);
+  gap: 16px;
   padding-right: var(--space-4);
 }
 
 .brand {
-  width: 170px;
-  height: 58px;
+  width: 154px;
+  height: 52px;
   flex: 0 0 auto;
   display: flex;
   align-items: center;
@@ -139,18 +140,18 @@ button {
 
 .brand-doodle {
   display: block;
-  width: 170px;
-  height: 58px;
+  width: 154px;
+  height: 52px;
 }
 
 .searchbar {
-  height: 54px;
+  height: 52px;
   width: var(--search-width);
   min-width: 280px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-5);
+  padding: 0 18px;
   border-radius: var(--radius-pill);
   background: var(--color-search);
 }
@@ -169,7 +170,7 @@ button {
 .searchbar-icons {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
 }
 
 .search-icon-button,
@@ -206,8 +207,8 @@ button {
 
 .search-divider {
   width: 1px;
-  height: 28px;
-  margin: 0 var(--space-1) 0 var(--space-2);
+  height: 26px;
+  margin: 0 3px 0 6px;
   background: var(--color-divider);
 }
 
@@ -215,13 +216,13 @@ button {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: var(--space-5);
+  gap: 16px;
 }
 
 .top-icon,
 .avatar {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   display: grid;
   place-items: center;
   color: var(--color-text-strong);
@@ -233,22 +234,23 @@ button {
 }
 
 .avatar {
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  border: 2px solid var(--color-avatar-ring);
-  background: radial-gradient(circle at 30% 25%, var(--color-avatar-light), var(--color-avatar-dark) 65%);
-  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  box-shadow: 0 0 0 1px var(--color-avatar-ring);
+  background: radial-gradient(circle at 32% 28%, var(--color-avatar-light) 0%, var(--color-avatar-mid) 50%, var(--color-avatar-dark) 100%);
+  font-size: 13px;
   font-weight: 700;
 }
 
 .results-nav {
   display: flex;
   align-items: center;
-  gap: 28px;
-  padding: var(--space-6) 0 13px;
+  gap: 24px;
+  padding: 20px 0 12px;
   color: var(--color-muted);
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .results-nav a {
@@ -589,13 +591,13 @@ button {
 @media (max-width: 1100px) {
   :root {
     --layout-left: 24px;
-    --search-width: min(860px, calc(100vw - 48px));
+    --search-width: min(804px, calc(100vw - 48px));
   }
 
   .topbar-row {
     width: calc(100% - 48px);
     flex-wrap: wrap;
-    gap: var(--space-4);
+    gap: 14px;
   }
 
   .searchbar {
@@ -616,7 +618,7 @@ button {
 
   .results-nav {
     flex-wrap: wrap;
-    gap: 18px;
+    gap: 16px;
     padding-right: var(--space-6);
   }
 
