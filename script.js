@@ -1,20 +1,21 @@
-const form = document.querySelector('#random-form');
-const resultNode = document.querySelector('#random-result');
-const minInput = document.querySelector('#min-value');
-const maxInput = document.querySelector('#max-value');
-const shareButton = document.querySelector('.share-button');
-const exclusionSummaryNode = document.querySelector('#exclusion-summary');
-const exclusionModal = document.querySelector('#exclusion-modal');
-const exclusionInput = document.querySelector('#exclusion-input');
-const exclusionFeedbackNode = document.querySelector('#exclusion-feedback');
-const exclusionSaveButton = document.querySelector('#exclusion-save');
-const exclusionCancelButton = document.querySelector('#exclusion-cancel');
+const form = document.querySelector("#random-form");
+const resultNode = document.querySelector("#random-result");
+const minInput = document.querySelector("#min-value");
+const maxInput = document.querySelector("#max-value");
+const shareButton = document.querySelector(".share-button");
+const exclusionSummaryNode = document.querySelector("#exclusion-summary");
+const exclusionModal = document.querySelector("#exclusion-modal");
+const exclusionInput = document.querySelector("#exclusion-input");
+const exclusionFeedbackNode = document.querySelector("#exclusion-feedback");
+const exclusionSaveButton = document.querySelector("#exclusion-save");
+const exclusionCancelButton = document.querySelector("#exclusion-cancel");
 
 const state = {
   min: 1,
   max: 10,
   result: 2,
   exclusions: new Set(),
+  isAnimating: false,
 };
 
 const integerPattern = /^[+-]?\d+$/;
@@ -41,7 +42,12 @@ function readRange() {
   const min = parseInteger(minInput.value);
   const max = parseInteger(maxInput.value);
 
-  if (min === null || max === null || min > max || !Number.isSafeInteger(max - min)) {
+  if (
+    min === null ||
+    max === null ||
+    min > max ||
+    !Number.isSafeInteger(max - min)
+  ) {
     return null;
   }
 
@@ -65,7 +71,7 @@ function getSortedExclusions() {
 }
 
 function serializeExclusions() {
-  return getSortedExclusions().join(', ');
+  return getSortedExclusions().join(", ");
 }
 
 function getRangeExclusionState(min, max) {
@@ -85,38 +91,13 @@ function getRangeExclusionState(min, max) {
 }
 
 function renderExclusionSummary() {
-  const { active, inactive } = getRangeExclusionState(state.min, state.max);
-  const rangeSize = state.max - state.min + 1;
-
-  exclusionSummaryNode.classList.toggle('is-warning', active.length >= rangeSize && rangeSize > 0);
-
-  if (!state.exclusions.size) {
-    exclusionSummaryNode.textContent = 'No exclusions saved.';
-    return;
-  }
-
-  const parts = [`${state.exclusions.size} exclusion${state.exclusions.size === 1 ? '' : 's'} saved`];
-
-  if (active.length) {
-    parts.push(`${active.length} active in range (${active.join(', ')})`);
-  } else {
-    parts.push('none active in range');
-  }
-
-  if (inactive.length) {
-    parts.push(`${inactive.length} inactive outside range`);
-  }
-
-  if (active.length >= rangeSize && rangeSize > 0) {
-    parts.push('all values in the current range are excluded');
-  }
-
-  exclusionSummaryNode.textContent = parts.join(' • ');
+  exclusionSummaryNode.textContent = "";
+  exclusionSummaryNode.classList.remove("is-warning");
 }
 
 function setModalFeedback(message, isError = false) {
   exclusionFeedbackNode.textContent = message;
-  exclusionFeedbackNode.classList.toggle('is-error', isError);
+  exclusionFeedbackNode.classList.toggle("is-error", isError);
 }
 
 function parseExclusions(rawValue) {
@@ -146,15 +127,22 @@ function parseExclusions(rawValue) {
 
 function openExclusionModal() {
   exclusionInput.value = serializeExclusions();
-  setModalFeedback(state.exclusions.size ? `${state.exclusions.size} exclusion${state.exclusions.size === 1 ? '' : 's'} currently saved.` : 'Leave the field blank to clear saved exclusions.');
+  setModalFeedback(
+    state.exclusions.size
+      ? `${state.exclusions.size} exclusion${state.exclusions.size === 1 ? "" : "s"} currently saved.`
+      : "Leave the field blank to clear saved exclusions.",
+  );
   exclusionModal.hidden = false;
   exclusionInput.focus();
-  exclusionInput.setSelectionRange(exclusionInput.value.length, exclusionInput.value.length);
+  exclusionInput.setSelectionRange(
+    exclusionInput.value.length,
+    exclusionInput.value.length,
+  );
 }
 
 function closeExclusionModal() {
   exclusionModal.hidden = true;
-  setModalFeedback('');
+  setModalFeedback("");
 }
 
 function getAllowedCount(min, max) {
@@ -190,8 +178,35 @@ function handleBlur() {
   commitRange(range);
 }
 
-function handleSubmit(event) {
+function animateRoll(min, max, finalValue, duration = 300, interval = 30) {
+  return new Promise((resolve) => {
+    const start = performance.now();
+    resultNode.classList.add("is-rolling");
+
+    const tick = () => {
+      const elapsed = performance.now() - start;
+      if (elapsed >= duration) {
+        resultNode.textContent = String(finalValue);
+        resultNode.classList.remove("is-rolling");
+        resolve();
+        return;
+      }
+      const span = max - min + 1;
+      const preview = min + Math.floor(Math.random() * span);
+      resultNode.textContent = String(preview);
+      setTimeout(tick, interval);
+    };
+
+    tick();
+  });
+}
+
+async function handleSubmit(event) {
   event.preventDefault();
+
+  if (state.isAnimating) {
+    return;
+  }
 
   const range = readRange();
 
@@ -209,15 +224,21 @@ function handleSubmit(event) {
     return;
   }
 
-  state.result = chooseAllowedValue(state.min, state.max);
-  resultNode.textContent = String(state.result);
+  const nextValue = chooseAllowedValue(state.min, state.max);
+  state.isAnimating = true;
+  await animateRoll(state.min, state.max, nextValue);
+  state.result = nextValue;
+  state.isAnimating = false;
 }
 
 function handleExclusionSave() {
   const { values, invalidTokens } = parseExclusions(exclusionInput.value);
 
   if (invalidTokens.length) {
-    setModalFeedback(`Use whole integers only. Invalid entries: ${invalidTokens.join(', ')}`, true);
+    setModalFeedback(
+      `Use whole integers only. Invalid entries: ${invalidTokens.join(", ")}`,
+      true,
+    );
     return;
   }
 
@@ -235,18 +256,18 @@ function handleModalClick(event) {
 }
 
 function handleDocumentKeydown(event) {
-  if (event.key === 'Escape' && !exclusionModal.hidden) {
+  if (event.key === "Escape" && !exclusionModal.hidden) {
     closeExclusionModal();
   }
 }
 
-minInput.addEventListener('blur', handleBlur);
-maxInput.addEventListener('blur', handleBlur);
-form.addEventListener('submit', handleSubmit);
-shareButton.addEventListener('click', openExclusionModal);
-exclusionSaveButton.addEventListener('click', handleExclusionSave);
-exclusionCancelButton.addEventListener('click', closeExclusionModal);
-exclusionModal.addEventListener('click', handleModalClick);
-document.addEventListener('keydown', handleDocumentKeydown);
+minInput.addEventListener("blur", handleBlur);
+maxInput.addEventListener("blur", handleBlur);
+form.addEventListener("submit", handleSubmit);
+shareButton.addEventListener("click", openExclusionModal);
+exclusionSaveButton.addEventListener("click", handleExclusionSave);
+exclusionCancelButton.addEventListener("click", closeExclusionModal);
+exclusionModal.addEventListener("click", handleModalClick);
+document.addEventListener("keydown", handleDocumentKeydown);
 
 syncUi();
