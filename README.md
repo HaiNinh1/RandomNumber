@@ -10,4 +10,4 @@ To enable it:
 3. Push to the default branch (or run the workflow manually if available).
 
 After deployment, the site will be available at:
-- `https://haininh1.github.io/RandomNumber/`
+`https://haininh1.github.io/RandomNumber/`
